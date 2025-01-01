@@ -1,0 +1,86 @@
+# Sentiment Analysis on Text Data Using Positive and Negative Word Lists
+# This script processes a dataset of text data and calculates sentiment scores based on both positive and negative word dictionaries.
+
+# Load necessary libraries
+library(stringr)  # For string manipulation
+library(tm)       # For text mining and text preprocessing
+library(plyr)     # For applying functions over lists
+
+# Step 1: Read in the dataset
+# Replace the file path with the actual location of your dataset
+Dataset <- read.csv('C:/Users/shreyash/Desktop/New folder/scoresportscars.csv')
+
+# Convert the text column into a factor (categorical data) for easier processing
+Dataset$text <- as.factor(Dataset$text)
+
+# Step 2: Load the positive and negative word dictionaries
+# Replace the file paths with the actual location of your positive and negative word lists
+pos.words <- scan('C:/Users/BHARAT/Desktop/DataSet/Dataset 2017/pos_words.txt', what = 'character', comment.char = ';')
+neg.words <- scan('C:/Users/BHARAT/Desktop/DataSet/Dataset 2017/neg_words.txt', what = 'character', comment.char = ';')
+
+# Optional: You can add custom words to the positive and negative word lists
+# pos.words <- c(pos.words, 'good', 'happy')
+# neg.words <- c(neg.words, 'sad', 'angry')
+
+# Step 3: Define the sentiment scoring function
+# This function processes sentences, calculates sentiment score based on both positive and negative word dictionaries
+
+score.sentiment <- function(sentences, pos.words, neg.words, .progress = 'none') {
+  
+  # Create a list to store sentiment scores
+  scores <- laply(sentences, function(sentence, pos.words, neg.words) {
+    
+    # Text cleaning: Remove unwanted text like retweets, mentions, punctuation, digits, and control characters
+    sentence = gsub("(RT|via)((?:\\b\\W*@\\w+)+)", "", sentence)  # Remove retweets and mentions
+    sentence <- gsub('[[:punct:]]', "", sentence)  # Remove punctuation
+    sentence <- gsub('[[:cntrl:]]', "", sentence)  # Remove control characters
+    sentence <- gsub('\d+', "", sentence)  # Remove digits
+    
+    # Convert text to lowercase
+    sentence <- tolower(sentence)
+    
+    # Split the sentence into words
+    word.list <- str_split(sentence, '\\s+')  # Split by spaces
+    words <- unlist(word.list)  # Flatten the list into a vector
+    
+    # Match words to the positive and negative word dictionaries
+    pos.matches <- match(words, pos.words)  # Find positive words
+    neg.matches <- match(words, neg.words)  # Find negative words
+    
+    # Convert matches to boolean values (TRUE = match found, FALSE = no match)
+    pos.matches <- !is.na(pos.matches)  # TRUE for positive word match
+    neg.matches <- !is.na(neg.matches)  # TRUE for negative word match
+    
+    # Calculate sentiment score: Positive matches subtract negative matches
+    score <- sum(pos.matches) - sum(neg.matches)  # Positive words increase score, negative words decrease it
+    
+    # Return the score
+    return(score)
+  }, pos.words, neg.words, .progress = .progress)
+  
+  # Create a data frame with scores and corresponding text
+  scores.df <- data.frame(score = scores, text = sentences)
+  
+  # Return the data frame
+  return(scores.df)
+}
+
+# Step 4: Apply the sentiment analysis function to the dataset
+# Apply the sentiment function on the 'text' column of the dataset
+scores <- score.sentiment(Dataset$text, pos.words, neg.words, .progress = 'text')
+
+# Step 5: Save the sentiment scores to a new CSV file
+# The sentiment scores are saved to a new CSV file with the sentiment score for each text
+write.csv(scores, file = 'C:/Users/shreyash/Desktop/New folder/scoresportscars_with_pos_neg_sentiment.csv', row.names = TRUE)
+
+sentiment-analysis-real-time/
+│
+├── scripts/
+│   └── sentiment_analysis_with_pos_neg.R   # Main R script for sentiment analysis with positive and negative words
+│
+├── data/
+│   ├── scoresportscars.csv                 # Input dataset (text data)
+│   ├── pos_words.txt                      # Positive word dictionary
+│   ├── neg_words.txt                      # Negative word dictionary
+│
+├── README.md                              # Project documentation (this file)
