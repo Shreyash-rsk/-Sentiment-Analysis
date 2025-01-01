@@ -1,0 +1,81 @@
+# Sentiment Analysis on Text Data Using Negative Word List
+# This script processes a dataset of text data and calculates sentiment scores based on negative word dictionaries.
+
+# Load necessary libraries
+library(stringr)  # For string manipulation
+library(tm)       # For text mining and text preprocessing
+library(plyr)     # For applying functions over lists
+
+# Step 1: Read in the dataset
+# Replace the file path with the actual location of your dataset
+Dataset <- read.csv('C:/Users/shreyash/Desktop/New folder/scoresportscars.csv')
+
+# Convert the text column into a factor (categorical data) for easier processing
+Dataset$text <- as.factor(Dataset$text)
+
+# Step 2: Load the negative word dictionary
+# Replace the file path with the actual location of your negative word list (the one you provided)
+neg.words <- scan('C:/Users/BHARAT/Desktop/DataSet/Dataset 2017/neg_words.txt', what='character', comment.char=';')
+
+# Optional: You can add custom negative words to the list if needed
+# neg.words <- c(neg.words, 'customword1', 'customword2')
+
+# Step 3: Define the sentiment scoring function
+# This function processes sentences, calculates sentiment score based on negative word dictionaries
+
+score.sentiment <- function(sentences, neg.words, .progress='none') {
+  
+  # Create a list to store sentiment scores
+  scores <- laply(sentences, function(sentence, neg.words) {
+    
+    # Text cleaning: Remove unwanted text like retweets, mentions, punctuation, digits, and control characters
+    sentence = gsub("(RT|via)((?:\\b\\W*@\\w+)+)", "", sentence)  # Remove retweets and mentions
+    sentence <- gsub('[[:punct:]]', "", sentence)  # Remove punctuation
+    sentence <- gsub('[[:cntrl:]]', "", sentence)  # Remove control characters
+    sentence <- gsub('\d+', "", sentence)  # Remove digits
+    
+    # Convert text to lowercase
+    sentence <- tolower(sentence)
+    
+    # Split the sentence into words
+    word.list <- str_split(sentence, '\\s+')  # Split by spaces
+    words <- unlist(word.list)  # Flatten the list into a vector
+    
+    # Match words to the negative word dictionary
+    neg.matches <- match(words, neg.words)  # Find negative words
+    
+    # Convert matches to boolean values (TRUE = match found, FALSE = no match)
+    neg.matches <- !is.na(neg.matches)  # TRUE for negative word match
+    
+    # Calculate sentiment score: Negative matches indicate a negative sentiment
+    score <- sum(neg.matches)  # Count the number of negative words in the sentence
+    
+    # Return the score
+    return(score)
+  }, neg.words, .progress = .progress)
+  
+  # Create a data frame with scores and corresponding text
+  scores.df <- data.frame(score = scores, text = sentences)
+  
+  # Return the data frame
+  return(scores.df)
+}
+
+# Step 4: Apply the sentiment analysis function to the dataset
+# Apply the sentiment function on the 'text' column of the dataset
+scores <- score.sentiment(Dataset$text, neg.words, .progress='text')
+
+# Step 5: Save the sentiment scores to a new CSV file
+# The sentiment scores are saved to a new CSV file with the sentiment score for each text
+write.csv(scores, file = 'C:/Users/shreyash/Desktop/New folder/scoresportscars_with_sentiment.csv', row.names = TRUE)
+
+sentiment-analysis-real-time/
+│
+├── scripts/
+│   └── sentiment_analysis.R        # Main R script for sentiment analysis
+│
+├── data/
+│   ├── scoresportscars.csv         # Input dataset (text data)
+│   ├── neg_words.txt              # Negative word dictionary
+│
+├── README.md                      # Project documentation (this file)
