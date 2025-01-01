@@ -1,27 +1,28 @@
-# Sentiment Analysis on Real-Time Data
+# Sentiment Analysis on Real-Time Data 📊💬
 
-This project performs sentiment analysis on real-time data from Twitter using R. It extracts tweets, processes the text, and determines whether the sentiment is positive, negative, or neutral.
+This project performs sentiment analysis on real-time data from Twitter using R. It extracts tweets, processes the text, and determines whether the sentiment is positive, negative, or neutral. 🔍😊😡
 
-## Technology Used
+## Technology Used 💻🔧
 
-- **Programming Language**: R
-- **IDE**: RStudio
-- **Libraries**: `twitteR`, `tidyverse`, `tm`, `syuzhet`, `sentimentr`, `ggplot2`
-- **Tools**: Twitter API for data extraction, Natural Language Processing (NLP) for text analysis
+- **Programming Language**: R 🦸‍♂️
+- **IDE**: RStudio 💼
+- **Libraries**: `twitteR`, `tidyverse`, `tm`, `syuzhet`, `sentimentr`, `ggplot2` 📚
+- **Tools**: Twitter API 🐦 for data extraction, Natural Language Processing (NLP) 🧠 for text analysis
 
-## Installation
+## Installation 🛠️
 
-1. Install R from [CRAN](https://cran.r-project.org/)
-2. Install RStudio from [RStudio](https://posit.co/download/rstudio-desktop/)
-3. Install required libraries:
-
+1. Install R from [CRAN](https://cran.r-project.org/) 🌍
+2. Install RStudio from [RStudio](https://posit.co/download/rstudio-desktop/) 💻
+3. Install required libraries using the following command in R:
 
 ```R
 install.packages(c("twitteR", "tidyverse", "tm", "syuzhet", "sentimentr", "ggplot2"))
 
+
+
 sentiment-analysis-real-time/
 │
 ├── scripts/
-│   └── sentiment_analysis.R    # Main R script
+│   └── sentiment_analysis.R    # Main R script 📝
 │
-├── README.md                   # This file
+├── README.md                   # This file 📄
