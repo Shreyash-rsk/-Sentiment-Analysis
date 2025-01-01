@@ -1,0 +1,89 @@
+# Sentiment Analysis on Text Data
+# This script processes a dataset of text data and calculates sentiment scores based on positive and negative word dictionaries.
+# Positive and negative word dictionaries are used to determine sentiment (positive, negative, or neutral).
+
+# Step 1: Load necessary libraries
+library(stringr)  # For string manipulation
+library(tm)       # For text mining and text preprocessing
+library(plyr)     # For applying functions over lists
+library(stringr)  # For string operations
+
+# Step 2: Read in the dataset
+# Replace the file path with the correct path to your dataset
+Dataset <- read.csv('C:/Users/shreyash/Desktop/New folder/scoresportscars.csv')
+
+# Convert the text column into a factor (categorical data) for easier processing
+Dataset$text <- as.factor(Dataset$text)
+
+# Step 3: Load positive and negative word dictionaries
+# Replace the file paths with the actual locations of your dictionaries
+pos.words <- scan('C:/Users/BHARAT/Desktop/DataSet/Dataset 2017/pos_words.txt', what='character', comment.char=';') # Positive word list
+neg.words <- scan('C:/Users/BHARAT/Desktop/DataSet/Dataset 2017/neg_words.txt', what='character', comment.char=';') # Negative word list
+
+# Optional: Adding custom words to the dictionaries
+# pos.words <- c(pos.words, 'upgrade')   # Add your custom positive words
+# neg.words <- c(neg.words, 'wtf', 'wait', 'waiting', 'epicfail')  # Add custom negative words
+
+# Step 4: Function to calculate sentiment scores
+# This function processes sentences, calculates sentiment score based on positive and negative word dictionaries
+
+score.sentiment <- function(sentences, pos.words, neg.words, .progress='none') {
+  
+  # Create a list to store scores
+  scores <- laply(sentences, function(sentence, pos.words, neg.words) {
+    
+    # Text cleaning: Removing retweets, URLs, punctuation, control characters, and digits
+    sentence = gsub("(RT|via)((?:\\b\\W*@\\w+)+)", "", sentence)  # Remove RTs and mentions
+    sentence <- gsub('[[:punct:]]', "", sentence)  # Remove punctuation
+    sentence <- gsub('[[:cntrl:]]', "", sentence)  # Remove control characters
+    sentence <- gsub('\d+', "", sentence)  # Remove digits
+    
+    # Convert text to lowercase
+    sentence <- tolower(sentence)
+    
+    # Split the sentence into words
+    word.list <- str_split(sentence, '\\s+')  # Split by spaces
+    words <- unlist(word.list)  # Flatten the list
+    
+    # Match words to positive and negative dictionaries
+    pos.matches <- match(words, pos.words)  # Find positive words
+    neg.matches <- match(words, neg.words)  # Find negative words
+    
+    # Convert matches to boolean values (TRUE = match found, FALSE = no match)
+    pos.matches <- !is.na(pos.matches)  # TRUE for positive word match
+    neg.matches <- !is.na(neg.matches)  # TRUE for negative word match
+    
+    # Calculate score: positive score - negative score
+    score <- sum(pos.matches) - sum(neg.matches)
+    
+    # Return the score
+    return(score)
+  }, pos.words, neg.words, .progress = .progress)
+  
+  # Create a data frame with scores and corresponding text
+  scores.df <- data.frame(score = scores, text = sentences)
+  
+  # Return the data frame
+  return(scores.df)
+}
+
+# Step 5: Apply sentiment analysis to the dataset
+# Apply the sentiment function on the 'text' column of the dataset
+scores <- score.sentiment(Dataset$text, pos.words, neg.words, .progress='text')
+
+# Step 6: Save the sentiment scores to a new CSV file
+# The sentiment scores are saved to a new CSV file
+write.csv(scores, file = 'C:/Users/shreyash/Desktop/New folder/scoresportscars.csv', row.names = TRUE)
+
+
+sentiment-analysis-real-time/
+│
+├── scripts/
+│   └── sentiment_analysis.R         # Main R script for sentiment analysis
+│
+├── data/
+│   ├── scoresportscars.csv          # Input data for sentiment analysis
+│   └── pos_words.txt               # Positive word dictionary
+│   └── neg_words.txt               # Negative word dictionary
+│
+├── README.md                       # Project documentation (this file)
