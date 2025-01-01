@@ -1,0 +1,40 @@
+# Twitter Data Extraction Script
+
+# Step 1: Load required libraries
+library(twitteR)  # Handles interaction with the Twitter API
+library(ROAuth)   # For OAuth authentication (used to access the Twitter API)
+library(plyr)     # A library for data manipulation (useful if you need to process the data later)
+
+# Step 2: Set up Twitter API credentials
+# Replace the placeholder API credentials with your own credentials obtained from the Twitter Developer Portal
+CUSTOMER_KEY <- "zNnMPXl0bvuTZlPAIeC80SbSe"  # Replace with your actual API Key
+CUSTOMER_SECRET <- "P8JDqF10ZHBZDDhyKuyQZzDX4kDShdZQFMfxNeUvDV7bh6RVSK"  # Replace with your actual API Secret Key
+ACCESS_TOKEN <- "2998940780-7WqGIFBpb4akg3INxKGXcv9uzprr86d2RG8gzEF"  # Replace with your actual Access Token
+ACCESS_secret <- "iiaD2XuuudRRu5JAGssR4Db2a0SHkebRpyJuAY2nNBfkL"  # Replace with your actual Access Token Secret
+
+# Step 3: Authenticate using Twitter API credentials
+# This step establishes a connection with Twitter's API using OAuth authentication
+setup_twitter_oauth(CUSTOMER_KEY, CUSTOMER_SECRET, ACCESS_TOKEN, ACCESS_secret)
+
+# Step 4: Fetch tweets related to IPL10 (Hashtag #IPL10)
+# Using the searchTwitter() function to retrieve tweets based on a hashtag (#IPL10), 
+# specify the number of tweets (n=5000), language (lang="en" for English), 
+# and date range (since='2017-03-31' and until='2017-04-13').
+IPL10 <- searchTwitter("#IPL10", n=5000, lang="en", since='2017-03-31', until='2017-04-13')
+
+# Step 5: Convert the list of tweets to a data frame
+# twListToDF() converts the list of tweets returned by searchTwitter() into a structured data frame (tweets_df).
+tweets_df <- twListToDF(IPL10)
+
+# Step 6: Save the tweet data to a CSV file
+# The write.csv() function saves the data frame (tweets_df) as a CSV file.
+# Modify the file path as per your system's directory structure.
+write.csv(tweets_df, file='C:/Users/Shreyash/Desktop/DataSet/IPL10.csv', row.names=FALSE)
+
+# Step 7: Optionally, print the first few rows of the data to inspect
+# head() is used to display the first few rows of the tweets data frame to check its structure.
+head(tweets_df)
+
+twitter_data_extraction.R      # R script for extracting Twitter data
+C:/Users/Shreyash/Desktop/DataSet/
+                               └── IPL10.csv                   # The file where tweets are saved
