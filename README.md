@@ -15,6 +15,10 @@ This project performs sentiment analysis on real-time data from Twitter using R.
 2. Install RStudio from [RStudio](https://posit.co/download/rstudio-desktop/)
 3. Install required libraries:
 
+git clone https://github.com/your-username/sentiment-analysis-real-time.git
+cd sentiment-analysis-real-time
+
+
 ```R
 install.packages(c("twitteR", "tidyverse", "tm", "syuzhet", "sentimentr", "ggplot2"))
 
